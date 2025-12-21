@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       idea:
-        description: 'Nə proqramı yaradım?'
+        description: 'App Idea'
         required: true
 permissions:
   contents: write
@@ -15,57 +15,36 @@ jobs:
       - uses: actions/setup-python@v4
         with: { python-version: '3.9' }
       - run: pip install google-generativeai
-
-      - name: Generate Code
+      - name: Generate
         env:
           KEY: ${{ secrets.GEMINI_API_KEY }}
           PROMPT: ${{ inputs.idea }}
         run: |
           python -c "
-          import os
-          import google.generativeai as genai
-
-          genai.configure(api_key=os.environ['KEY'])
-          model = genai.GenerativeModel('gemini-1.5-flash')
-
-          prompt = f'''
-          Sən Next.js və React Three Fiber Ekspertisən.
-          İstək: {os.environ['PROMPT']}
-          
-          Qaydalar:
-          1. 3D varsa: Canvas, OrbitControls, Mesh istifadə et.
-          2. 3D yoxdursa: Sadə, modern Tailwind CSS qur.
-          
-          Format:
+          import os, google.generativeai as g
+          g.configure(api_key=os.environ['KEY'])
+          model = g.GenerativeModel('gemini-1.5-flash')
+          p = f'''Create Next.js app. User want: {os.environ['PROMPT']}. 
+          If 3D needed use @react-three/fiber.
+          Output format:
           ---CLIENT---
-          (app/page.tsx kodu)
+          (code)
           ---END---
           ---ADMIN---
-          (app/admin/page.tsx kodu)
-          ---END---
-          '''
-
+          (code)
+          ---END---'''
           try:
-            res = model.generate_content(prompt).text
-            # Markdown təmizləmə
-            res = res.replace('\`\`\`tsx', '').replace('\`\`\`', '')
-            
-            client = res.split('---CLIENT---')[1].split('---END---')[0]
-            admin = res.split('---ADMIN---')[1].split('---END---')[0]
-
+            res = model.generate_content(p).text
+            c = res.split('---CLIENT---')[1].split('---END---')[0]
+            a = res.split('---ADMIN---')[1].split('---END---')[0]
             os.makedirs('app/admin', exist_ok=True)
-            with open('app/page.tsx', 'w', encoding='utf-8') as f: f.write(client)
-            with open('app/admin/page.tsx', 'w', encoding='utf-8') as f: f.write(admin)
-
-            pkg = '{\"name\":\"ai-app\",\"dependencies\":{\"next\":\"latest\",\"react\":\"latest\",\"react-dom\":\"latest\",\"three\":\"latest\",\"@react-three/fiber\":\"latest\",\"@react-three/drei\":\"latest\",\"lucide-react\":\"latest\"}}'
-            with open('package.json', 'w', encoding='utf-8') as f: f.write(pkg)
-          except: pass
-          "
-
-      - name: Save Changes
-        run: |
+            with open('app/page.tsx','w') as f: f.write(c)
+            with open('app/admin/page.tsx','w') as f: f.write(a)
+            with open('package.json','w') as f: f.write('{\"name\":\"app\",\"dependencies\":{\"next\":\"latest\",\"react\":\"latest\",\"react-dom\":\"latest\",\"three\":\"latest\",\"@react-three/fiber\":\"latest\",\"@react-three/drei\":\"latest\"}}')
+          except: pass"
+      - run: |
           git config --global user.name 'Bot'
-          git config --global user.email 'bot@ai.com'
+          git config --global user.email 'bot@x.com'
           git add .
           git commit -m "Done"
           git push
