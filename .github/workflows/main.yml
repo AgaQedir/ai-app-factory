@@ -1,4 +1,3 @@
-name: AI App Factory
 on:
   workflow_dispatch:
     inputs:
