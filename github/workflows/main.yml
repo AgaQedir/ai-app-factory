@@ -1,0 +1,71 @@
+name: AI App Factory
+on:
+  workflow_dispatch:
+    inputs:
+      idea:
+        description: 'Nə proqramı yaradım?'
+        required: true
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with: { python-version: '3.9' }
+      - run: pip install google-generativeai
+
+      - name: Generate Code
+        env:
+          KEY: ${{ secrets.GEMINI_API_KEY }}
+          PROMPT: ${{ inputs.idea }}
+        run: |
+          python -c "
+          import os
+          import google.generativeai as genai
+
+          genai.configure(api_key=os.environ['KEY'])
+          model = genai.GenerativeModel('gemini-1.5-flash')
+
+          prompt = f'''
+          Sən Next.js və React Three Fiber Ekspertisən.
+          İstək: {os.environ['PROMPT']}
+          
+          Qaydalar:
+          1. 3D varsa: Canvas, OrbitControls, Mesh istifadə et.
+          2. 3D yoxdursa: Sadə, modern Tailwind CSS qur.
+          
+          Format:
+          ---CLIENT---
+          (app/page.tsx kodu)
+          ---END---
+          ---ADMIN---
+          (app/admin/page.tsx kodu)
+          ---END---
+          '''
+
+          try:
+            res = model.generate_content(prompt).text
+            # Markdown təmizləmə
+            res = res.replace('\`\`\`tsx', '').replace('\`\`\`', '')
+            
+            client = res.split('---CLIENT---')[1].split('---END---')[0]
+            admin = res.split('---ADMIN---')[1].split('---END---')[0]
+
+            os.makedirs('app/admin', exist_ok=True)
+            with open('app/page.tsx', 'w', encoding='utf-8') as f: f.write(client)
+            with open('app/admin/page.tsx', 'w', encoding='utf-8') as f: f.write(admin)
+
+            pkg = '{\"name\":\"ai-app\",\"dependencies\":{\"next\":\"latest\",\"react\":\"latest\",\"react-dom\":\"latest\",\"three\":\"latest\",\"@react-three/fiber\":\"latest\",\"@react-three/drei\":\"latest\",\"lucide-react\":\"latest\"}}'
+            with open('package.json', 'w', encoding='utf-8') as f: f.write(pkg)
+          except: pass
+          "
+
+      - name: Save Changes
+        run: |
+          git config --global user.name 'Bot'
+          git config --global user.email 'bot@ai.com'
+          git add .
+          git commit -m "Done"
+          git push
