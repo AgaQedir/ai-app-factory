@@ -1,45 +1,57 @@
+"use client";
+
 import React from 'react';
-import { Line } from 'react-chartjs-2';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { Wallet, TrendingUp, Settings } from 'lucide-react';
 
-const data = {
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-  datasets: [
-    {
-      label: 'Crypto Price',
-      data: [20, 30, 25, 40, 50, 45, 60],
-      fill: true,
-      backgroundColor: 'rgba(139, 0, 255, 0.2)',
-      borderColor: 'rgba(139, 0, 255, 1)',
-      tension: 0.1,
-    },
-  ],
+const data = [
+    { name: 'Jan', price: 4000 },
+    { name: 'Feb', price: 3000 },
+    { name: 'Mar', price: 2000 },
+    { name: 'Apr', price: 2780 },
+    { name: 'May', price: 3908 },
+    { name: 'Jun', price: 4800 },
+];
+
+const Dashboard = () => {
+    return (
+        <div className="flex bg-gray-900 text-white min-h-screen">
+            <aside className="w-1/4 bg-gray-800 p-4">
+                <h1 className="text-xl font-bold mb-4">Crypto Dashboard</h1>
+                <nav className="flex flex-col">
+                    <div className="flex items-center mb-4">
+                        <Wallet size={20} className="mr-2 text-purple-500" />
+                        <span>Wallet</span>
+                    </div>
+                    <div className="flex items-center mb-4">
+                        <TrendingUp size={20} className="mr-2 text-purple-500" />
+                        <span>Market</span>
+                    </div>
+                    <div className="flex items-center mb-4">
+                        <Settings size={20} className="mr-2 text-purple-500" />
+                        <span>Settings</span>
+                    </div>
+                </nav>
+            </aside>
+            <main className="flex-grow p-8">
+                <h2 className="text-2xl font-bold mb-4">Price Chart</h2>
+                <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <LineChart width={800} height={400} data={data}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="price" stroke="#9b59b6" strokeWidth={2} />
+                    </LineChart>
+                </div>
+                <div className="flex justify-between mt-8">
+                    <button className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition">Buy</button>
+                    <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition">Sell</button>
+                </div>
+            </main>
+        </div>
+    );
 };
 
-const CryptoDashboard = () => {
-  return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      <aside className="w-1/4 p-5 bg-gray-800">
-        <h2 className="text-2xl mb-6">Crypto Dashboard</h2>
-        <nav>
-          <ul className="space-y-4">
-            <li><button className="w-full text-left p-2 hover:bg-purple-600 rounded">Wallet</button></li>
-            <li><button className="w-full text-left p-2 hover:bg-purple-600 rounded">Market</button></li>
-            <li><button className="w-full text-left p-2 hover:bg-purple-600 rounded">Settings</button></li>
-          </ul>
-        </nav>
-      </aside>
-      <main className="flex-1 p-5">
-        <h1 className="text-3xl mb-4">Current Price Chart</h1>
-        <div className="bg-gray-800 rounded-lg shadow-lg p-5 mb-10">
-          <Line data={data} options={{ maintainAspectRatio: false }} />
-        </div>
-        <div className="flex justify-between">
-          <button className="bg-purple-600 hover:bg-purple-500 text-white py-2 px-4 rounded">Buy</button>
-          <button className="bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded">Sell</button>
-        </div>
-      </main>
-    </div>
-  );
-};
-
-export default CryptoDashboard;
+export default Dashboard;
