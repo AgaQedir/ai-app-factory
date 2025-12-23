@@ -1,9 +1,11 @@
+name: AI App Factory (GPT)
 on:
   workflow_dispatch:
     inputs:
       idea:
         description: 'App Idea'
         required: true
+        default: 'Crypto Dashboard'
 permissions:
   contents: write
 jobs:
@@ -13,37 +15,83 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with: { python-version: '3.9' }
-      - run: pip install google-generativeai
-      - name: Generate
+      
+      - name: Install Libraries
+        run: pip install openai
+
+      - name: Generate App with GPT
         env:
-          KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PROMPT: ${{ inputs.idea }}
         run: |
           python -c "
-          import os, google.generativeai as g
-          g.configure(api_key=os.environ['KEY'])
-          model = g.GenerativeModel('gemini-1.5-flash')
-          p = f'''Create Next.js app. User want: {os.environ['PROMPT']}. 
-          If 3D needed use @react-three/fiber.
-          Output format:
-          ---CLIENT---
-          (code)
-          ---END---
-          ---ADMIN---
-          (code)
-          ---END---'''
+          import os
+          import sys
+          from openai import OpenAI
+
+          print('--- 🧠 GPT BEYNİ İŞƏ DÜŞDÜ ---')
+          
+          # 1. Açarı yoxlayırıq
+          api_key = os.environ.get('OPENAI_API_KEY')
+          if not api_key:
+              print('❌ XƏTA: Açar tapılmadı! Adını düzgün qoymusan?')
+              sys.exit(1)
+
+          client = OpenAI(api_key=api_key)
+
+          # 2. GPT-yə əmr veririk
+          print(f'Sorğu: {os.environ["PROMPT"]}')
+          
+          system_prompt = '''You are an expert React & Next.js developer.
+          Create a SINGLE FILE component (page.tsx).
+          Use Tailwind CSS for styling. Use 'lucide-react' for icons.
+          IMPORTANT: Wrap your code inside ---CLIENT--- and ---END--- tags.
+          '''
+          
+          user_prompt = f'''Create a modern web page. 
+          Topic: {os.environ["PROMPT"]}.
+          Style: Dark mode, futuristic, professional.
+          '''
+
           try:
-            res = model.generate_content(p).text
-            c = res.split('---CLIENT---')[1].split('---END---')[0]
-            a = res.split('---ADMIN---')[1].split('---END---')[0]
-            os.makedirs('app/admin', exist_ok=True)
-            with open('app/page.tsx','w') as f: f.write(c)
-            with open('app/admin/page.tsx','w') as f: f.write(a)
-            with open('package.json','w') as f: f.write('{\"name\":\"app\",\"dependencies\":{\"next\":\"latest\",\"react\":\"latest\",\"react-dom\":\"latest\",\"three\":\"latest\",\"@react-three/fiber\":\"latest\",\"@react-three/drei\":\"latest\"}}')
-          except: pass"
-      - run: |
-          git config --global user.name 'Bot'
-          git config --global user.email 'bot@x.com'
+              response = client.chat.completions.create(
+                  model='gpt-4o-mini',
+                  messages=[
+                      {'role': 'system', 'content': system_prompt},
+                      {'role': 'user', 'content': user_prompt}
+                  ]
+              )
+              
+              res = response.choices[0].message.content
+              print('✅ GPT Cavab Verdi!')
+
+              if '---CLIENT---' in res:
+                  code_content = res.split('---CLIENT---')[1].split('---END---')[0].strip()
+              else:
+                  # Ehtiyat variant
+                  code_content = res.replace('```tsx', '').replace('```', '')
+
+              # 3. Faylı yazırıq
+              os.makedirs('app', exist_ok=True)
+              with open('app/page.tsx', 'w', encoding='utf-8') as f:
+                  f.write(code_content)
+              
+              # Lazımi fayl
+              pkg = '{\"name\":\"ai-app\",\"dependencies\":{\"next\":\"latest\",\"react\":\"latest\",\"react-dom\":\"latest\",\"lucide-react\":\"latest\"}}'
+              with open('package.json', 'w', encoding='utf-8') as f:
+                  f.write(pkg)
+                  
+              print('🎉 FAYLLAR HAZIRDIR!')
+
+          except Exception as e:
+              print(f'❌ XƏTA OLDU: {e}')
+              sys.exit(1)
+          "
+
+      - name: Save Code to GitHub
+        run: |
+          git config --global user.name 'AI Bot'
+          git config --global user.email 'bot@ai.com'
           git add .
-          git commit -m "Done"
+          git commit -m "New App Created by GPT"
           git push
