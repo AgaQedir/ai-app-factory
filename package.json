@@ -1,22 +1,6 @@
 {
-  "name": "ai-app-factory",
-  "version": "2.0.0",
+  "name": "ai-factory-ui",
+  "version": "1.0.0",
   "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
-  "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "lucide-react": "latest",
-    "framer-motion": "latest",
-    "clsx": "latest",
-    "tailwind-merge": "latest"
-  },
-  "devDependencies": {
-    "typescript": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "postcss": "latest",
-    "tailwindcss": "latest"
-  }
+  "dependencies": { "next": "latest", "react": "latest", "react-dom": "latest" }
 }
