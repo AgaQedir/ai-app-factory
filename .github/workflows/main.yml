@@ -1,4 +1,4 @@
-name: AI App Factory (GPT)
+name: AI App Factory (FINAL)
 on:
   workflow_dispatch:
     inputs:
@@ -16,82 +16,81 @@ jobs:
       - uses: actions/setup-python@v4
         with: { python-version: '3.9' }
       
-      - name: Install Libraries
-        run: pip install openai
+      - run: pip install openai
 
-      - name: Generate App with GPT
+      - name: Generate App
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PROMPT: ${{ inputs.idea }}
         run: |
-          python -c "
+          # Python skriptini fayla yaziriq (Xeta olmamasi ucun)
+          cat <<EOF > generator.py
           import os
           import sys
           from openai import OpenAI
 
           print('--- 🧠 GPT BEYNİ İŞƏ DÜŞDÜ ---')
-          
-          # 1. Açarı yoxlayırıq
+
           api_key = os.environ.get('OPENAI_API_KEY')
+          user_idea = os.environ.get('PROMPT')
+
           if not api_key:
-              print('❌ XƏTA: Açar tapılmadı! Adını düzgün qoymusan?')
+              print('❌ XƏTA: API Açar tapılmadı!')
               sys.exit(1)
 
           client = OpenAI(api_key=api_key)
 
-          # 2. GPT-yə əmr veririk
-          print(f'Sorğu: {os.environ["PROMPT"]}')
-          
-          system_prompt = '''You are an expert React & Next.js developer.
-          Create a SINGLE FILE component (page.tsx).
-          Use Tailwind CSS for styling. Use 'lucide-react' for icons.
-          IMPORTANT: Wrap your code inside ---CLIENT--- and ---END--- tags.
-          '''
-          
-          user_prompt = f'''Create a modern web page. 
-          Topic: {os.environ["PROMPT"]}.
-          Style: Dark mode, futuristic, professional.
-          '''
+          print(f'Sorğu: {user_idea}')
+
+          system_msg = "You are an expert Next.js developer. Output code inside ---CLIENT--- and ---END--- tags."
+          user_msg = f"Create a modern Next.js page (page.tsx) with Tailwind. Request: {user_idea}"
 
           try:
               response = client.chat.completions.create(
-                  model='gpt-4o-mini',
+                  model="gpt-4o-mini",
                   messages=[
-                      {'role': 'system', 'content': system_prompt},
-                      {'role': 'user', 'content': user_prompt}
+                      {"role": "system", "content": system_msg},
+                      {"role": "user", "content": user_msg}
                   ]
               )
               
               res = response.choices[0].message.content
               print('✅ GPT Cavab Verdi!')
 
-              if '---CLIENT---' in res:
-                  code_content = res.split('---CLIENT---')[1].split('---END---')[0].strip()
-              else:
-                  # Ehtiyat variant
-                  code_content = res.replace('```tsx', '').replace('```', '')
-
-              # 3. Faylı yazırıq
-              os.makedirs('app', exist_ok=True)
-              with open('app/page.tsx', 'w', encoding='utf-8') as f:
-                  f.write(code_content)
-              
-              # Lazımi fayl
-              pkg = '{\"name\":\"ai-app\",\"dependencies\":{\"next\":\"latest\",\"react\":\"latest\",\"react-dom\":\"latest\",\"lucide-react\":\"latest\"}}'
-              with open('package.json', 'w', encoding='utf-8') as f:
-                  f.write(pkg)
+              if "---CLIENT---" in res:
+                  code = res.split("---CLIENT---")[1].split("---END---")[0].strip()
                   
-              print('🎉 FAYLLAR HAZIRDIR!')
+                  os.makedirs("app", exist_ok=True)
+                  with open("app/page.tsx", "w", encoding="utf-8") as f:
+                      f.write(code)
+                  
+                  # Package.json
+                  pkg = '{"name":"ai-app","dependencies":{"next":"latest","react":"latest","react-dom":"latest","lucide-react":"latest"}}'
+                  with open("package.json", "w", encoding="utf-8") as f:
+                      f.write(pkg)
+                      
+                  print("🎉 FAYLLAR UĞURLA YARANDI!")
+              else:
+                  print("⚠️ GPT kod formatini sehven 'markdown' kimi verdi, duzeldilir...")
+                  # Ehtiyat variant
+                  code = res.replace("```tsx", "").replace("```", "")
+                  os.makedirs("app", exist_ok=True)
+                  with open("app/page.tsx", "w", encoding="utf-8") as f:
+                      f.write(code)
+                  print("🎉 FAYLLAR (EHTIYAT VARIANTLA) YARANDI!")
 
           except Exception as e:
-              print(f'❌ XƏTA OLDU: {e}')
+              print(f"❌ KRITİK XƏTA: {e}")
               sys.exit(1)
-          "
+          EOF
 
-      - name: Save Code to GitHub
+          # İndi skripti işə salırıq
+          python generator.py
+
+      - name: Save to GitHub
         run: |
-          git config --global user.name 'AI Bot'
+          git config --global user.name 'Bot'
           git config --global user.email 'bot@ai.com'
           git add .
-          git commit -m "New App Created by GPT"
+          git commit -m "New App Generated"
           git push
