@@ -12,7 +12,11 @@
         "react-dom": "latest",
         "lucide-react": "latest",
         "framer-motion": "latest",
-        "recharts": "latest"
+        "recharts": "latest",
+        "chart.js": "latest",
+        "react-chartjs-2": "latest",
+        "clsx": "latest",
+        "tailwind-merge": "latest"
       },
       "devDependencies": {
         "typescript": "latest",

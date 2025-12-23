@@ -1,74 +1,45 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { Line } from 'react-chartjs-2';
 
-const HomePage = () => {
-    const [data, setData] = useState({
-        labels: [],
-        datasets: [
-            {
-                label: 'Price',
-                data: [],
-                borderColor: 'rgba(156, 39, 176, 1)',
-                backgroundColor: 'rgba(156, 39, 176, 0.2)',
-                borderWidth: 2,
-            },
-        ],
-    });
-
-    useEffect(() => {
-        // Mock price data
-        const fetchData = () => {
-            const newLabels = Array.from({ length: 10 }, (_, i) => `Day ${i + 1}`);
-            const newData = Array.from({ length: 10 }, () => Math.floor(Math.random() * 100) + 1);
-            setData({
-                labels: newLabels,
-                datasets: [
-                    {
-                        label: 'Price',
-                        data: newData,
-                        borderColor: 'rgba(156, 39, 176, 1)',
-                        backgroundColor: 'rgba(156, 39, 176, 0.2)',
-                        borderWidth: 2,
-                    },
-                ],
-            });
-        };
-
-        fetchData();
-    }, []);
-
-    return (
-        <div className="flex h-screen bg-gray-900 text-white">
-            <div className="w-1/4 h-full bg-gray-800 p-5">
-                <h2 className="text-2xl font-semibold mb-5">Crypto Dashboard</h2>
-                <ul className="space-y-3">
-                    <li className="cursor-pointer hover:bg-gray-700 p-2 rounded">Wallet</li>
-                    <li className="cursor-pointer hover:bg-gray-700 p-2 rounded">Market</li>
-                    <li className="cursor-pointer hover:bg-gray-700 p-2 rounded">Settings</li>
-                </ul>
-            </div>
-            <div className="flex-1 p-10">
-                <div className="flex justify-between items-center mb-5">
-                    <h1 className="text-4xl font-bold">Current Price</h1>
-                    <div className="space-x-3">
-                        <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">Buy</button>
-                        <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Sell</button>
-                    </div>
-                </div>
-                <div className="bg-gray-800 rounded-lg p-5">
-                    <Line data={data} options={{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                            },
-                        },
-                    }} />
-                </div>
-            </div>
-        </div>
-    );
+const data = {
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+  datasets: [
+    {
+      label: 'Crypto Price',
+      data: [20, 30, 25, 40, 50, 45, 60],
+      fill: true,
+      backgroundColor: 'rgba(139, 0, 255, 0.2)',
+      borderColor: 'rgba(139, 0, 255, 1)',
+      tension: 0.1,
+    },
+  ],
 };
 
-export default HomePage;
+const CryptoDashboard = () => {
+  return (
+    <div className="flex h-screen bg-gray-900 text-white">
+      <aside className="w-1/4 p-5 bg-gray-800">
+        <h2 className="text-2xl mb-6">Crypto Dashboard</h2>
+        <nav>
+          <ul className="space-y-4">
+            <li><button className="w-full text-left p-2 hover:bg-purple-600 rounded">Wallet</button></li>
+            <li><button className="w-full text-left p-2 hover:bg-purple-600 rounded">Market</button></li>
+            <li><button className="w-full text-left p-2 hover:bg-purple-600 rounded">Settings</button></li>
+          </ul>
+        </nav>
+      </aside>
+      <main className="flex-1 p-5">
+        <h1 className="text-3xl mb-4">Current Price Chart</h1>
+        <div className="bg-gray-800 rounded-lg shadow-lg p-5 mb-10">
+          <Line data={data} options={{ maintainAspectRatio: false }} />
+        </div>
+        <div className="flex justify-between">
+          <button className="bg-purple-600 hover:bg-purple-500 text-white py-2 px-4 rounded">Buy</button>
+          <button className="bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded">Sell</button>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default CryptoDashboard;
