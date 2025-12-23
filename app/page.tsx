@@ -1,127 +1,154 @@
 "use client";
 import React, { useState } from 'react';
-// İkonlar üçün sadə SVG-lər işlədirik (Xəta olmasın)
-const IconZap = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>;
-const IconCode = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>;
-const IconPlay = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
-const IconSettings = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>;
 
-export default function Dashboard() {
+// İkonlar (Səhvsiz işləməsi üçün birbaşa SVG)
+const Icons = {
+  Zap: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  Code: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
+  Play: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>,
+  Box: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
+  User: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+};
+
+export default function AppFactory() {
   const [prompt, setPrompt] = useState("");
-  const [generating, setGenerating] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle, loading, done
 
-  const handleGen = () => {
-    setGenerating(true);
-    setTimeout(() => setGenerating(false), 2500);
+  const handleBuild = () => {
+    if(!prompt) return;
+    setStatus("loading");
+    setTimeout(() => setStatus("done"), 3000);
   }
 
   return (
-    <div className="flex h-screen w-full bg-black text-white font-sans">
-      {/* SIDEBAR */}
-      <div className="w-20 md:w-64 border-r border-white/10 flex flex-col bg-zinc-950">
-        <div className="h-16 flex items-center gap-3 px-6 border-b border-white/10">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)]">
-            <IconZap />
+    <div className="flex h-screen w-full bg-black text-white">
+      {/* SOL MENYU */}
+      <div className="w-64 bg-[#0a0a0a] border-r border-[#222] flex flex-col hidden md:flex">
+        <div className="h-16 flex items-center gap-3 px-6 border-b border-[#222]">
+          <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
+            <Icons.Zap />
           </div>
-          <span className="hidden md:block font-bold text-lg tracking-tight">AppFactory</span>
+          <span className="font-bold text-lg tracking-wide">AI Factory</span>
         </div>
         
         <div className="p-4 space-y-2">
-          <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/10 text-white cursor-pointer hover:bg-white/10 transition">
-            <IconCode /> <span className="hidden md:block">Editor</span>
+          <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg text-white font-medium cursor-pointer border border-white/5">
+            <Icons.Code /> Editor
           </div>
-          <div className="flex items-center gap-3 p-3 text-gray-400 hover:text-white cursor-pointer hover:bg-white/5 rounded-lg transition">
-            <IconSettings /> <span className="hidden md:block">Settings</span>
+          <div className="flex items-center gap-3 p-3 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition cursor-pointer">
+            <Icons.Box /> Projects
           </div>
         </div>
-        
-        <div className="mt-auto p-6 border-t border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500"></div>
-            <div className="hidden md:block">
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-gray-500">Pro Plan</p>
+
+        <div className="mt-auto p-4 border-t border-[#222]">
+          <div className="flex items-center gap-3 p-2 rounded hover:bg-[#111] cursor-pointer">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center">
+              <Icons.User />
+            </div>
+            <div>
+              <div className="font-medium text-sm">Admin</div>
+              <div className="text-xs text-green-400">● Online</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="flex-1 flex flex-col relative overflow-hidden bg-gradient-to-br from-black via-zinc-900 to-black">
+      {/* ƏSAS HİSSƏ */}
+      <div className="flex-1 flex flex-col relative bg-[#050505]">
         {/* HEADER */}
-        <header className="h-16 border-b border-white/10 flex items-center justify-between px-8 bg-black/50 backdrop-blur-md sticky top-0 z-10">
-          <div className="text-sm text-gray-400">Project / <span className="text-white">New AI App</span></div>
-          <button className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-md text-sm font-medium flex items-center gap-2 shadow-lg transition-all">
-            <IconPlay /> Deploy App
+        <header className="h-16 border-b border-[#222] flex items-center justify-between px-6 bg-[#0a0a0a]">
+          <div className="text-sm text-gray-400">Workspace / <span className="text-white font-medium">New Project</span></div>
+          <button className="bg-white text-black px-4 py-2 rounded font-bold text-sm hover:bg-gray-200 transition flex items-center gap-2">
+            <Icons.Play /> Deploy
           </button>
         </header>
 
-        {/* WORKSPACE */}
-        <div className="flex-1 flex p-6 gap-6">
-          
+        <div className="flex-1 flex overflow-hidden">
           {/* INPUT AREA */}
-          <div className="w-full md:w-1/3 flex flex-col gap-4">
-            <div className="flex-1 bg-zinc-900/50 border border-white/10 rounded-xl p-6 flex flex-col backdrop-blur-sm">
-              <h2 className="text-xl font-semibold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">AI Architect</h2>
-              <p className="text-gray-400 text-sm mb-6">Describe your dream app logic below.</p>
-              
-              <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
-                <div className="bg-white/5 p-4 rounded-lg border border-white/5 text-sm text-gray-300">
-                   Hello! I'm ready to build. Try: "Create a CRM for a real estate agency".
-                </div>
-                {generating && (
-                  <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg text-sm text-blue-200 animate-pulse">
-                     Generating database schema... <br/> Designing UI components...
+          <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
+            <div className="max-w-xl mx-auto w-full">
+              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                What will we build?
+              </h1>
+              <p className="text-gray-400 mb-8">Describe your app logic, UI, and features.</p>
+
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="relative bg-[#111] border border-[#333] rounded-xl overflow-hidden">
+                  <textarea 
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="w-full h-40 bg-transparent p-4 text-lg focus:outline-none resize-none placeholder-gray-600"
+                    placeholder="Example: Create a Crypto Dashboard with dark mode..."
+                  ></textarea>
+                  <div className="flex justify-between items-center p-4 border-t border-[#222] bg-[#0a0a0a]">
+                    <span className="text-xs text-gray-500">AI Model: GPT-4o</span>
+                    <button 
+                      onClick={handleBuild}
+                      className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                    >
+                      {status === 'loading' ? 'Building...' : 'Generate App'}
+                    </button>
                   </div>
-                )}
+                </div>
               </div>
 
-              <div className="relative">
-                <textarea 
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Type your idea here..."
-                  className="w-full h-32 bg-black/50 border border-white/20 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition resize-none text-white placeholder-gray-600"
-                ></textarea>
-                <button 
-                  onClick={handleGen}
-                  className="absolute bottom-4 right-4 bg-white text-black p-2 rounded-lg hover:scale-105 transition active:scale-95"
-                >
-                  <IconZap />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* PREVIEW AREA */}
-          <div className="hidden md:flex flex-1 bg-black border border-white/10 rounded-xl overflow-hidden flex-col shadow-2xl relative">
-            <div className="h-10 bg-zinc-900 border-b border-white/10 flex items-center px-4 gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
-              <div className="ml-auto text-xs text-gray-600 font-mono">preview.localhost:3000</div>
-            </div>
-            
-            <div className="flex-1 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black">
-              {generating ? (
-                <div className="text-center">
-                  <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-gray-400 animate-pulse">Building Application...</p>
-                </div>
-              ) : (
-                <div className="text-center opacity-30">
-                  <div className="w-20 h-20 bg-white/10 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                    <IconCode />
+              {/* STATUS LOGS */}
+              {status !== 'idle' && (
+                <div className="mt-8 space-y-2 font-mono text-sm">
+                  <div className="text-green-400 flex items-center gap-2">
+                    <span>✓</span> Analyzing prompt requirements...
                   </div>
-                  <p className="text-gray-500">App Preview Area</p>
+                  {status === 'loading' && (
+                    <div className="text-blue-400 flex items-center gap-2 animate-pulse">
+                      <span>➜</span> Generating React components...
+                    </div>
+                  )}
+                  {status === 'done' && (
+                    <>
+                      <div className="text-green-400 flex items-center gap-2">
+                        <span>✓</span> Components Generated successfully.
+                      </div>
+                      <div className="p-4 mt-4 bg-green-500/10 border border-green-500/30 rounded text-green-200">
+                        App is ready! Check the preview.
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-
-            {/* DECORATIVE GLOW */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 blur-[100px] pointer-events-none rounded-full"></div>
           </div>
 
+          {/* PREVIEW AREA (RIGHT) */}
+          <div className="hidden md:flex flex-1 bg-[#000] border-l border-[#222] relative items-center justify-center bg-[radial-gradient(#1a1a1a_1px,transparent_1px)] [background-size:16px_16px]">
+            {status === 'idle' ? (
+              <div className="text-center opacity-30">
+                <Icons.Code />
+                <p className="mt-4 text-sm font-mono">Waiting for input...</p>
+              </div>
+            ) : (
+               <div className="w-[90%] h-[80%] bg-[#111] rounded-xl border border-[#333] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-500">
+                 <div className="h-8 bg-[#1a1a1a] border-b border-[#333] flex items-center px-3 gap-2">
+                   <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                   <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                   <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                 </div>
+                 <div className="flex-1 flex items-center justify-center p-8">
+                   {status === 'loading' ? (
+                     <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                   ) : (
+                     <div className="text-center">
+                       <h2 className="text-2xl font-bold mb-2">Crypto Dashboard</h2>
+                       <div className="grid grid-cols-2 gap-4 mt-8 w-64 mx-auto">
+                          <div className="h-20 bg-[#222] rounded animate-pulse"></div>
+                          <div className="h-20 bg-[#222] rounded animate-pulse"></div>
+                       </div>
+                     </div>
+                   )}
+                 </div>
+               </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
