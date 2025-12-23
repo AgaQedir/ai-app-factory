@@ -1,11 +1,6 @@
-name: AI App Factory (ULTIMATE FIX)
+name: DEPLOY PLATFORM UI
 on:
   workflow_dispatch:
-    inputs:
-      idea:
-        description: 'App Idea'
-        required: true
-        default: 'Crypto Dashboard'
 permissions:
   contents: write
 jobs:
@@ -15,121 +10,229 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with: { python-version: '3.9' }
-      
-      - run: pip install openai
 
-      - name: Generate Ultimate App
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PROMPT: ${{ inputs.idea }}
+      - name: Build The Platform
         run: |
-          cat <<EOF > generator.py
-          import os
-          import sys
-          from openai import OpenAI
-
-          print('--- 🚀 SON HƏMLƏ: ALL-IN-ONE SYSTEM ---')
-
-          api_key = os.environ.get('OPENAI_API_KEY')
-          user_idea = os.environ.get('PROMPT')
-
-          if not api_key:
-              print("❌ Açar yoxdur!")
-              sys.exit(1)
-
-          client = OpenAI(api_key=api_key)
-
-          # GPT-yə dəqiq əmr
-          system_msg = """You are a senior React Developer.
-          Create a SINGLE FILE component (page.tsx).
-          Use 'lucide-react' for icons.
-          Use 'recharts' for charts (ResponsiveContainer, AreaChart, etc.).
-          Use 'framer-motion' for animations.
-          Style with Tailwind CSS.
-          Do NOT write 'use client' at the top, I will add it.
-          Output ONLY the code inside ---CLIENT--- tags."""
+          # 1. Platforma Fayllarını Yaradırıq
+          os_dir="app"
+          mkdir -p $os_dir
           
-          user_msg = f"Create a high-end, futuristic dashboard. Topic: {user_idea}. Make it dark mode, neon style."
-
-          try:
-              response = client.chat.completions.create(
-                  model="gpt-4o-mini",
-                  messages=[
-                      {"role": "system", "content": system_msg},
-                      {"role": "user", "content": user_msg}
-                  ]
-              )
-              res = response.choices[0].message.content
-              
-              # Kodu təmizləyirik
-              if "---CLIENT---" in res:
-                  code = res.split("---CLIENT---")[1].split("---END---")[0].strip()
-              else:
-                  code = res.replace("```tsx", "").replace("```", "")
-
-              # HƏLL 1: 'use client' məcburi əlavə olunur
-              code = code.replace('"use client";', '').replace("'use client';", '')
-              final_code = '"use client";\n\n' + code
-
-              os.makedirs("app", exist_ok=True)
-              with open("app/page.tsx", "w", encoding="utf-8") as f:
-                  f.write(final_code)
-
-              # HƏLL 2: Bütün lazımi kitabxanalar (Chart, Motion, vs.)
-              pkg = '''{
-                "name": "ai-app",
-                "version": "1.0.0",
-                "scripts": {
-                  "dev": "next dev",
-                  "build": "next build",
-                  "start": "next start"
-                },
-                "dependencies": {
-                  "next": "latest",
-                  "react": "latest",
-                  "react-dom": "latest",
-                  "lucide-react": "latest",
-                  "framer-motion": "latest",
-                  "recharts": "latest",
-                  "clsx": "latest",
-                  "tailwind-merge": "latest"
-                },
-                "devDependencies": {
-                  "typescript": "latest",
-                  "@types/node": "latest",
-                  "@types/react": "latest",
-                  "@types/react-dom": "latest",
-                  "postcss": "latest",
-                  "tailwindcss": "latest"
-                }
-              }'''
-              
-              with open("package.json", "w", encoding="utf-8") as f:
-                  f.write(pkg)
-                  
-              # HƏLL 3: Tailwind Config
-              tw_config = '''/** @type {import('tailwindcss').Config} */
-              module.exports = {
-                content: ["./app/**/*.{js,ts,jsx,tsx}"],
-                theme: { extend: {} },
-                plugins: [],
-              }'''
-              with open("tailwind.config.js", "w", encoding="utf-8") as f:
-                  f.write(tw_config)
-
-              print("🎉 SİSTEM TAM HAZIRDIR!")
-
-          except Exception as e:
-              print(f"XETA: {e}")
-              sys.exit(1)
+          # 2. Package.json (Bütün lazımi alətlər)
+          cat <<EOF > package.json
+          {
+            "name": "ai-app-factory",
+            "version": "2.0.0",
+            "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
+            "dependencies": {
+              "next": "latest",
+              "react": "latest",
+              "react-dom": "latest",
+              "lucide-react": "latest",
+              "framer-motion": "latest",
+              "clsx": "latest",
+              "tailwind-merge": "latest"
+            },
+            "devDependencies": {
+              "typescript": "latest",
+              "@types/node": "latest",
+              "@types/react": "latest",
+              "@types/react-dom": "latest",
+              "postcss": "latest",
+              "tailwindcss": "latest"
+            }
+          }
           EOF
 
-          python generator.py
+          # 3. Tailwind Config
+          cat <<EOF > tailwind.config.js
+          /** @type {import('tailwindcss').Config} */
+          module.exports = {
+            content: ["./app/**/*.{js,ts,jsx,tsx}"],
+            theme: { 
+              extend: {
+                colors: {
+                  dark: "#0a0a0a",
+                  panel: "#111111",
+                  border: "#222222",
+                  primary: "#0070f3",
+                  accent: "#7928ca"
+                }
+              } 
+            },
+            plugins: [],
+          }
+          EOF
 
-      - name: Save to GitHub
+          # 4. GLOBAL CSS (Qaranlıq rejim üçün)
+          cat <<EOF > app/globals.css
+          @tailwind base;
+          @tailwind components;
+          @tailwind utilities;
+          body { background: #000; color: #fff; }
+          EOF
+
+          # 5. LAYOUT (Skelet)
+          cat <<EOF > app/layout.tsx
+          import './globals.css'
+          import { Inter } from 'next/font/google'
+          const inter = Inter({ subsets: ['latin'] })
+          export default function RootLayout({ children }: { children: React.ReactNode }) {
+            return (
+              <html lang="en">
+                <body className={inter.className}>{children}</body>
+              </html>
+            )
+          }
+          EOF
+
+          # 6. ƏSAS SƏHİFƏ (DASHBOARD UI)
+          cat <<EOF > app/page.tsx
+          "use client";
+          import React, { useState } from 'react';
+          import { Terminal, Code, Play, Layers, Settings, Zap, MessageSquare, ChevronRight, User } from 'lucide-react';
+          import { motion } from 'framer-motion';
+
+          export default function Platform() {
+            const [activeTab, setActiveTab] = useState('editor');
+            const [prompt, setPrompt] = useState('');
+            const [isGenerating, setIsGenerating] = useState(false);
+
+            const handleGenerate = () => {
+              setIsGenerating(true);
+              setTimeout(() => setIsGenerating(false), 2000);
+            };
+
+            return (
+              <div className="flex h-screen bg-black text-white font-sans overflow-hidden">
+                {/* SOL MENYU (SIDEBAR) */}
+                <div className="w-64 border-r border-gray-800 flex flex-col bg-[#050505]">
+                  <div className="p-4 border-b border-gray-800 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                      <Zap size={18} fill="white" />
+                    </div>
+                    <span className="font-bold text-lg tracking-tight">AI App Factory</span>
+                  </div>
+                  
+                  <nav className="flex-1 p-2 space-y-1">
+                    <NavItem icon={<Code />} label="Editor" active={activeTab === 'editor'} onClick={() => setActiveTab('editor')} />
+                    <NavItem icon={<Layers />} label="Projects" active={activeTab === 'projects'} onClick={() => setActiveTab('projects')} />
+                    <NavItem icon={<Terminal />} label="Database" active={activeTab === 'db'} onClick={() => setActiveTab('db')} />
+                    <NavItem icon={<Settings />} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+                  </nav>
+
+                  <div className="p-4 border-t border-gray-800">
+                    <div className="flex items-center gap-3 p-2 rounded hover:bg-gray-900 cursor-pointer">
+                      <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                        <User size={16} />
+                      </div>
+                      <div className="text-sm">
+                        <div className="font-medium">Admin User</div>
+                        <div className="text-gray-500 text-xs">Pro Plan</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ORTA HİSSƏ (CHAT & WORKSPACE) */}
+                <div className="flex-1 flex flex-col">
+                  {/* Header */}
+                  <header className="h-14 border-b border-gray-800 flex items-center justify-between px-6 bg-[#050505]">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <span>My Projects</span>
+                      <ChevronRight size={14} />
+                      <span className="text-white">Crypto Dashboard v2</span>
+                    </div>
+                    <div className="flex gap-3">
+                      <button className="px-4 py-1.5 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition">Preview</button>
+                      <button className="px-4 py-1.5 text-sm bg-blue-600 hover:bg-blue-500 rounded-md flex items-center gap-2 transition">
+                        <Play size={14} /> Deploy
+                      </button>
+                    </div>
+                  </header>
+
+                  {/* Main Area */}
+                  <div className="flex-1 flex">
+                    {/* Chat / Config */}
+                    <div className="w-1/3 border-r border-gray-800 p-6 flex flex-col bg-[#080808]">
+                      <h2 className="text-xl font-semibold mb-6">AI Generator</h2>
+                      
+                      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                        <div className="bg-gray-900 p-4 rounded-lg border border-gray-800 text-sm text-gray-300">
+                          Welcome back! I'm ready to build. Describe your app logic or UI requirements.
+                        </div>
+                        {isGenerating && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-blue-900/20 border border-blue-800 p-4 rounded-lg text-sm text-blue-200"
+                          >
+                            Generating code structures... Parsing UI components...
+                          </motion.div>
+                        )}
+                      </div>
+
+                      <div className="relative">
+                        <textarea 
+                          className="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 min-h-[120px] text-sm focus:outline-none focus:border-blue-500 transition resize-none"
+                          placeholder="Describe your app (e.g., 'Create a CRM with dark mode')..."
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value)}
+                        />
+                        <button 
+                          onClick={handleGenerate}
+                          className="absolute bottom-3 right-3 bg-white text-black p-2 rounded-lg hover:bg-gray-200 transition"
+                        >
+                          <Zap size={18} fill="black" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Preview / Code */}
+                    <div className="flex-1 bg-[#050505] p-6 flex flex-col items-center justify-center text-gray-500">
+                      <div className="w-full h-full border border-gray-800 rounded-lg bg-[#0a0a0a] overflow-hidden flex flex-col">
+                        <div className="bg-gray-900 px-4 py-2 border-b border-gray-800 flex gap-2">
+                          <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
+                          <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                          <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
+                        </div>
+                        <div className="flex-1 flex items-center justify-center">
+                          {isGenerating ? (
+                             <div className="text-center space-y-4">
+                               <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                               <p className="text-sm">AI is building your app...</p>
+                             </div>
+                          ) : (
+                             <div className="text-center space-y-4 opacity-50">
+                               <Code size={48} className="mx-auto mb-2" />
+                               <p>App Preview will appear here</p>
+                             </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          function NavItem({ icon, label, active, onClick }: any) {
+            return (
+              <button 
+                onClick={onClick}
+                className={\`flex items-center gap-3 w-full p-2 rounded-md text-sm transition \${active ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-900 hover:text-white'}\`}
+              >
+                {icon}
+                <span>{label}</span>
+              </button>
+            )
+          }
+          EOF
+
+      - name: Deploy Config
         run: |
-          git config --global user.name 'AI Factory'
-          git config --global user.email 'bot@factory.com'
+          git config --global user.name 'Platform Bot'
+          git config --global user.email 'bot@platform.com'
           git add .
-          git commit -m "Ultimate Fix Deployed"
+          git commit -m "Deploy AI App Factory Platform UI"
           git push
