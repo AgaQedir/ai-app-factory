@@ -1,153 +1,56 @@
 "use client";
 import React, { useState } from 'react';
 
-// İkonlar (Səhvsiz işləməsi üçün birbaşa SVG)
-const Icons = {
-  Zap: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-  Code: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
-  Play: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>,
-  Box: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
-  User: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-};
+// İKONLAR (SVG)
+const IconZap = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+const IconPlay = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>;
 
 export default function AppFactory() {
   const [prompt, setPrompt] = useState("");
-  const [status, setStatus] = useState("idle"); // idle, loading, done
-
-  const handleBuild = () => {
-    if(!prompt) return;
-    setStatus("loading");
-    setTimeout(() => setStatus("done"), 3000);
-  }
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="flex h-screen w-full bg-black text-white">
-      {/* SOL MENYU */}
-      <div className="w-64 bg-[#0a0a0a] border-r border-[#222] flex flex-col hidden md:flex">
-        <div className="h-16 flex items-center gap-3 px-6 border-b border-[#222]">
-          <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.6)]">
-            <Icons.Zap />
-          </div>
-          <span className="font-bold text-lg tracking-wide">AI Factory</span>
+      {/* SOL TƏRƏF */}
+      <div className="w-64 bg-[#0a0a0a] border-r border-[#222] hidden md:flex flex-col p-4">
+        <div className="flex items-center gap-2 mb-8 text-blue-500 font-bold text-xl">
+          <IconZap /> AI Factory
         </div>
-        
-        <div className="p-4 space-y-2">
-          <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg text-white font-medium cursor-pointer border border-white/5">
-            <Icons.Code /> Editor
-          </div>
-          <div className="flex items-center gap-3 p-3 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition cursor-pointer">
-            <Icons.Box /> Projects
-          </div>
-        </div>
-
-        <div className="mt-auto p-4 border-t border-[#222]">
-          <div className="flex items-center gap-3 p-2 rounded hover:bg-[#111] cursor-pointer">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center">
-              <Icons.User />
-            </div>
-            <div>
-              <div className="font-medium text-sm">Admin</div>
-              <div className="text-xs text-green-400">● Online</div>
-            </div>
-          </div>
-        </div>
+        <div className="p-3 bg-[#111] rounded border border-[#333] mb-2 cursor-pointer text-white">Editor</div>
+        <div className="p-3 text-gray-400 hover:text-white cursor-pointer">Projects</div>
+        <div className="p-3 text-gray-400 hover:text-white cursor-pointer">Settings</div>
       </div>
 
-      {/* ƏSAS HİSSƏ */}
-      <div className="flex-1 flex flex-col relative bg-[#050505]">
-        {/* HEADER */}
-        <header className="h-16 border-b border-[#222] flex items-center justify-between px-6 bg-[#0a0a0a]">
-          <div className="text-sm text-gray-400">Workspace / <span className="text-white font-medium">New Project</span></div>
-          <button className="bg-white text-black px-4 py-2 rounded font-bold text-sm hover:bg-gray-200 transition flex items-center gap-2">
-            <Icons.Play /> Deploy
+      {/* ORTA TƏRƏF */}
+      <div className="flex-1 flex flex-col bg-[#000]">
+        <header className="h-16 border-b border-[#222] flex items-center justify-between px-6">
+          <span className="text-gray-400">New Project</span>
+          <button className="bg-white text-black px-4 py-2 rounded font-bold hover:bg-gray-200 flex items-center gap-2">
+            <IconPlay /> Deploy
           </button>
         </header>
 
-        <div className="flex-1 flex overflow-hidden">
-          {/* INPUT AREA */}
-          <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
-            <div className="max-w-xl mx-auto w-full">
-              <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                What will we build?
-              </h1>
-              <p className="text-gray-400 mb-8">Describe your app logic, UI, and features.</p>
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="max-w-2xl w-full text-center">
+            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+              Build Apps with AI
+            </h1>
+            <p className="text-gray-400 mb-8 text-lg">Describe your dream app, and we will code it.</p>
 
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                <div className="relative bg-[#111] border border-[#333] rounded-xl overflow-hidden">
-                  <textarea 
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="w-full h-40 bg-transparent p-4 text-lg focus:outline-none resize-none placeholder-gray-600"
-                    placeholder="Example: Create a Crypto Dashboard with dark mode..."
-                  ></textarea>
-                  <div className="flex justify-between items-center p-4 border-t border-[#222] bg-[#0a0a0a]">
-                    <span className="text-xs text-gray-500">AI Model: GPT-4o</span>
-                    <button 
-                      onClick={handleBuild}
-                      className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium transition shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-                    >
-                      {status === 'loading' ? 'Building...' : 'Generate App'}
-                    </button>
-                  </div>
-                </div>
+            <div className="relative bg-[#111] border border-[#333] rounded-2xl overflow-hidden p-2">
+              <textarea 
+                className="w-full h-32 bg-transparent p-4 text-white text-lg focus:outline-none resize-none"
+                placeholder="Example: Create a Crypto Trading Dashboard..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+              <div className="flex justify-between items-center px-4 py-2 border-t border-[#222]">
+                <span className="text-xs text-gray-500">Model: GPT-4o</span>
+                <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium">
+                  Generate Code
+                </button>
               </div>
-
-              {/* STATUS LOGS */}
-              {status !== 'idle' && (
-                <div className="mt-8 space-y-2 font-mono text-sm">
-                  <div className="text-green-400 flex items-center gap-2">
-                    <span>✓</span> Analyzing prompt requirements...
-                  </div>
-                  {status === 'loading' && (
-                    <div className="text-blue-400 flex items-center gap-2 animate-pulse">
-                      <span>➜</span> Generating React components...
-                    </div>
-                  )}
-                  {status === 'done' && (
-                    <>
-                      <div className="text-green-400 flex items-center gap-2">
-                        <span>✓</span> Components Generated successfully.
-                      </div>
-                      <div className="p-4 mt-4 bg-green-500/10 border border-green-500/30 rounded text-green-200">
-                        App is ready! Check the preview.
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
             </div>
-          </div>
-
-          {/* PREVIEW AREA (RIGHT) */}
-          <div className="hidden md:flex flex-1 bg-[#000] border-l border-[#222] relative items-center justify-center bg-[radial-gradient(#1a1a1a_1px,transparent_1px)] [background-size:16px_16px]">
-            {status === 'idle' ? (
-              <div className="text-center opacity-30">
-                <Icons.Code />
-                <p className="mt-4 text-sm font-mono">Waiting for input...</p>
-              </div>
-            ) : (
-               <div className="w-[90%] h-[80%] bg-[#111] rounded-xl border border-[#333] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-500">
-                 <div className="h-8 bg-[#1a1a1a] border-b border-[#333] flex items-center px-3 gap-2">
-                   <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-                   <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-                   <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
-                 </div>
-                 <div className="flex-1 flex items-center justify-center p-8">
-                   {status === 'loading' ? (
-                     <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                   ) : (
-                     <div className="text-center">
-                       <h2 className="text-2xl font-bold mb-2">Crypto Dashboard</h2>
-                       <div className="grid grid-cols-2 gap-4 mt-8 w-64 mx-auto">
-                          <div className="h-20 bg-[#222] rounded animate-pulse"></div>
-                          <div className="h-20 bg-[#222] rounded animate-pulse"></div>
-                       </div>
-                     </div>
-                   )}
-                 </div>
-               </div>
-            )}
           </div>
         </div>
       </div>
