@@ -1,90 +1,140 @@
 "use client";
-
-```tsx
+import React, { useState } from 'react';
+import { Terminal, Code, Play, Layers, Settings, Zap, MessageSquare, ChevronRight, User } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Input, Button } from 'lucide-react';
 
-const data = [
-  { name: 'Page A', value: 4000 },
-  { name: 'Page B', value: 3000 },
-  { name: 'Page C', value: 2000 },
-  { name: 'Page D', value: 2780 },
-  { name: 'Page E', value: 1890 },
-];
+export default function Platform() {
+  const [activeTab, setActiveTab] = useState('editor');
+  const [prompt, setPrompt] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
-const LandingPage = () => {
+  const handleGenerate = () => {
+    setIsGenerating(true);
+    setTimeout(() => setIsGenerating(false), 2000);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#162447] text-white">
-      <motion.header 
-        className="text-center mb-16"
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        transition={{ duration: 1 }}
-      >
-        <h1 className="text-4xl font-bold text-purple-400">
-          Generate Full Web Apps with AI in Seconds
-        </h1>
-      </motion.header>
+    <div className="flex h-screen bg-black text-white font-sans overflow-hidden">
+      {/* SOL MENYU (SIDEBAR) */}
+      <div className="w-64 border-r border-gray-800 flex flex-col bg-[#050505]">
+        <div className="p-4 border-b border-gray-800 flex items-center gap-2">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <Zap size={18} fill="white" />
+          </div>
+          <span className="font-bold text-lg tracking-tight">AI App Factory</span>
+        </div>
+        
+        <nav className="flex-1 p-2 space-y-1">
+          <NavItem icon={<Code />} label="Editor" active={activeTab === 'editor'} onClick={() => setActiveTab('editor')} />
+          <NavItem icon={<Layers />} label="Projects" active={activeTab === 'projects'} onClick={() => setActiveTab('projects')} />
+          <NavItem icon={<Terminal />} label="Database" active={activeTab === 'db'} onClick={() => setActiveTab('db')} />
+          <NavItem icon={<Settings />} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+        </nav>
 
-      <div className="mb-12">
-        <motion.input 
-          type="text" 
-          placeholder="Describe your dream app..." 
-          className="p-4 w-80 bg-gray-800 border border-purple-600 rounded-md text-purple-200 placeholder-purple-500 focus:outline-none transition duration-200"
-          initial={{ scale: 0.9 }} 
-          animate={{ scale: 1 }} 
-          transition={{ duration: 0.5 }}
-        />
+        <div className="p-4 border-t border-gray-800">
+          <div className="flex items-center gap-3 p-2 rounded hover:bg-gray-900 cursor-pointer">
+            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+              <User size={16} />
+            </div>
+            <div className="text-sm">
+              <div className="font-medium">Admin User</div>
+              <div className="text-gray-500 text-xs">Pro Plan</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-purple-400 mb-8">How it Works</h2>
-        <div className="flex space-x-6">
-          <div className="flex flex-col items-center">
-            <Input className="text-purple-400 w-10 h-10 mb-2" />
-            <h3 className="text-lg">1. Type Idea</h3>
+      {/* ORTA HİSSƏ (CHAT & WORKSPACE) */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="h-14 border-b border-gray-800 flex items-center justify-between px-6 bg-[#050505]">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <span>My Projects</span>
+            <ChevronRight size={14} />
+            <span className="text-white">Crypto Dashboard v2</span>
           </div>
-          <div className="flex flex-col items-center">
-            <Input className="text-purple-400 w-10 h-10 mb-2" />
-            <h3 className="text-lg">2. AI Builds</h3>
+          <div className="flex gap-3">
+            <button className="px-4 py-1.5 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition">Preview</button>
+            <button className="px-4 py-1.5 text-sm bg-blue-600 hover:bg-blue-500 rounded-md flex items-center gap-2 transition">
+              <Play size={14} /> Deploy
+            </button>
           </div>
-          <div className="flex flex-col items-center">
-            <Input className="text-purple-400 w-10 h-10 mb-2" />
-            <h3 className="text-lg">3. Deploy</h3>
-          </div>
-        </div>
-      </section>
+        </header>
 
-      <ResponsiveContainer width="100%" height={200} className="mb-12">
-        <AreaChart data={data}>
-          <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#9a0f84" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#6f2c91" stopOpacity={0.8} />
-            </linearGradient>
-          </defs>
-          <Area type="monotone" dataKey="value" stroke="#9a0f84" fill="url(#colorUv)" />
-        </AreaChart>
-      </ResponsiveContainer>
+        {/* Main Area */}
+        <div className="flex-1 flex">
+          {/* Chat / Config */}
+          <div className="w-1/3 border-r border-gray-800 p-6 flex flex-col bg-[#080808]">
+            <h2 className="text-xl font-semibold mb-6">AI Generator</h2>
+            
+            <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+              <div className="bg-gray-900 p-4 rounded-lg border border-gray-800 text-sm text-gray-300">
+                Welcome back! I'm ready to build. Describe your app logic or UI requirements.
+              </div>
+              {isGenerating && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-blue-900/20 border border-blue-800 p-4 rounded-lg text-sm text-blue-200"
+                >
+                  Generating code structures... Parsing UI components...
+                </motion.div>
+              )}
+            </div>
 
-      <section className="flex space-x-4">
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition ease-in-out duration-200">
-          <h4 className="text-xl text-purple-400">Free</h4>
-          <p className="text-white">Basic features included.</p>
+            <div className="relative">
+              <textarea 
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 min-h-[120px] text-sm focus:outline-none focus:border-blue-500 transition resize-none"
+                placeholder="Describe your app (e.g., 'Create a CRM with dark mode')..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+              <button 
+                onClick={handleGenerate}
+                className="absolute bottom-3 right-3 bg-white text-black p-2 rounded-lg hover:bg-gray-200 transition"
+              >
+                <Zap size={18} fill="black" />
+              </button>
+            </div>
+          </div>
+
+          {/* Preview / Code */}
+          <div className="flex-1 bg-[#050505] p-6 flex flex-col items-center justify-center text-gray-500">
+            <div className="w-full h-full border border-gray-800 rounded-lg bg-[#0a0a0a] overflow-hidden flex flex-col">
+              <div className="bg-gray-900 px-4 py-2 border-b border-gray-800 flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                {isGenerating ? (
+                   <div className="text-center space-y-4">
+                     <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                     <p className="text-sm">AI is building your app...</p>
+                   </div>
+                ) : (
+                   <div className="text-center space-y-4 opacity-50">
+                     <Code size={48} className="mx-auto mb-2" />
+                     <p>App Preview will appear here</p>
+                   </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition ease-in-out duration-200">
-          <h4 className="text-xl text-purple-400">Pro</h4>
-          <p className="text-white">Advanced features and support.</p>
-        </div>
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition ease-in-out duration-200">
-          <h4 className="text-xl text-purple-400">Enterprise</h4>
-          <p className="text-white">Custom solutions for your needs.</p>
-        </div>
-      </section>
+      </div>
     </div>
   );
-};
+}
 
-export default LandingPage;
-```
+function NavItem({ icon, label, active, onClick }: any) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`flex items-center gap-3 w-full p-2 rounded-md text-sm transition ${active ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-900 hover:text-white'}`}
+    >
+      {icon}
+      <span>{label}</span>
+    </button>
+  )
+}
