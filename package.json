@@ -13,8 +13,6 @@
         "lucide-react": "latest",
         "framer-motion": "latest",
         "recharts": "latest",
-        "chart.js": "latest",
-        "react-chartjs-2": "latest",
         "clsx": "latest",
         "tailwind-merge": "latest"
       },
